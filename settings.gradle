@@ -1,2 +1,5 @@
 rootProject.name = 'gradle-test7'
+include 'utils'
+include 'core'
+include 'api'
 
