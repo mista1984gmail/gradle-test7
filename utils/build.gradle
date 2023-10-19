@@ -59,3 +59,34 @@ task copyDocs(type: Copy) {
 
 jar.finalizedBy copyDocs
 copyDocs.dependsOn jar
+
+apply plugin: CheckUseJacocoForTesting
+
+class CheckUseJacocoForTesting implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        project.task("report_jacoco_test")
+                .doLast {
+                    File reportJacocoDir = project.file('reports/jacoco')
+                    Date createJacocoIndexFile;
+                    String report = "";
+                    if (!reportJacocoDir.exists()) {
+                        project.mkdir(reportJacocoDir)
+                    }
+                    File reportsJacocoDir = project.file('build/reports/jacoco')
+                    if (reportsJacocoDir.exists()) {
+                        File jacocoIndex = new File("build/reports/jacoco/test/html/index.html")
+                        if (jacocoIndex.exists()) {
+                            createJacocoIndexFile = new Date(jacocoIndex.lastModified())
+                        }
+                        report = "Module ${project.name.toString().toUpperCase()} contains library JaCoCo for testing. \nLast test completed " + createJacocoIndexFile
+                    } else {
+                        report = "Module ${project.name.toString().toUpperCase()} don't contain library JaCoCo for testing."
+                    }
+                    File reportJacocoFile = new File("reports/jacoco/${project.name}-test-report.txt")
+                    reportJacocoFile.createNewFile()
+                    reportJacocoFile.write(report)
+                }
+    }
+}
